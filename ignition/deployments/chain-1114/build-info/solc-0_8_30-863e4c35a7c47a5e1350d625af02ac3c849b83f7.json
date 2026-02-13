@@ -1,0 +1,39 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_30-863e4c35a7c47a5e1350d625af02ac3c849b83f7",
+  "solcVersion": "0.8.30",
+  "solcLongVersion": "0.8.30+commit.73712a01",
+  "userSourceNameMap": {
+    "contracts/AttendanceRegistry.sol": "project/contracts/AttendanceRegistry.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "prague",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode",
+            "evm.deployedBytecode",
+            "evm.methodIdentifiers",
+            "metadata"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/AttendanceRegistry.sol": {
+        "content": "// SPDX-License-Identifier: Unlicensed\npragma solidity ^0.8.30;\n\ncontract AttendanceRegistry {\n    struct Student {\n        string name;\n        uint8 age;\n        bool present;\n    }\n\n    Student[] public students;\n    mapping(bytes32 => uint256) private _nameToIndex;\n    mapping(bytes32 => bool) private _exists;\n\n    event StudentAdded(string name, uint8 age, bool present);\n    event AttendanceMarked(string name, bool present);\n\n    function addStudent(string calldata _name, uint8 _age) external returns (Student memory) {\n        bytes32 nameHash = keccak256(bytes(_name));\n\n        if (_exists[nameHash]) {\n            uint256 idx = _nameToIndex[nameHash];\n            bool newPresent = !students[idx].present;\n            students[idx].present = newPresent;\n            emit AttendanceMarked(_name, newPresent);\n            return students[idx];\n        }\n\n        _nameToIndex[nameHash] = students.length;\n        _exists[nameHash] = true;\n        students.push(Student(_name, _age, true));\n        emit StudentAdded(_name, _age, true);\n        return students[students.length - 1];\n    }\n}\n"
+      }
+    }
+  }
+}
